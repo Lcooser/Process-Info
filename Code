@@ -1,0 +1,36 @@
+import psutil
+
+
+def convert_bytes(size):
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if size < 1024.0:
+            return "%3.1f %s" % (size, x)
+        size /= 1024.0
+
+    return size
+
+
+processos = psutil.process_iter(['pid', 'name', 'username'])
+processos = list(processos)
+
+
+processos_info = []
+for processo in processos:
+    processo_atual = {
+        'PID' : '',
+        'Nome' : '',
+        'Uso_memoria' : '',
+        'Uso_cpu' : ''
+    }
+    processo_atual['PID'] = processo.info['pid']
+    processo_atual['Nome'] = processo.info['name']
+    if psutil.pid_exists(processo.info['pid']):
+        processo_atual['Uso_memoria'] = convert_bytes(psutil.Process(processo.info['pid']).memory_info()[3])
+        processo_atual['Uso_cpu'] = psutil.Process(processo.info['pid']).cpu_percent()
+    else:
+        pass
+    processos_info.append(processo_atual)
+print(processos_info)
+
+
+
